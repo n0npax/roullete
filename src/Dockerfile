@@ -5,6 +5,6 @@ COPY . /app
 WORKDIR /app
 RUN go install ./...
 
-FROM alpine:latest
-COPY --from=builder /go/bin/* /usr/local/bin
-
+FROM debian:unstable-slim
+COPY --from=builder /go/bin/* /usr/local/bin/
+ENTRYPOINT ["sleep 300"]
