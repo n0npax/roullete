@@ -34,7 +34,7 @@ func Run(port int, url string) {
 
 	// Set up routes
 	r := gin.Default()
-	r.GET("",
+	r.GET("/api/v1/random/field/",
 		opengintracing.SpanFromHeadersHttpFmt(trace, "RandomField", fn, false),
 		func(c *gin.Context) {
 			n, err := randomNum(url)

@@ -32,7 +32,7 @@ func Run(port int) {
 
 	// Set up routes
 	r := gin.Default()
-	r.GET("",
+	r.GET("/api/v1/random/int",
 		opengintracing.SpanFromHeadersHttpFmt(trace, "RandomNum", fn, false),
 		func(c *gin.Context) {
 			c.JSON(200, gin.H{
