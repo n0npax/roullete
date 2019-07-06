@@ -10,7 +10,8 @@ import (
 var (
 	args = os.Args[1:]
 	port = kingpin.Flag("port", "application port").Short('p').Default("8182").Int()
-	url  = kingpin.Flag("url", "random num url").Short('u').Default("http://localhost:8181/").String()
+	rUrl = kingpin.Flag("random-api", "random-api url").Default("http://localhost:8181/api/v1/random/int/").String()
+	cUrl = kingpin.Flag("colour-api", "colour-api url").Default("http://localhost:8183/api/v1/colour/%d/").String()
 )
 
 func main() {
@@ -18,5 +19,5 @@ func main() {
 	if err != nil {
 		panic("Arg parsing failed")
 	}
-	app.Run(*port, *url)
+	app.Run(*port, *rUrl, *cUrl)
 }

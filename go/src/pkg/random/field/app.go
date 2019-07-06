@@ -15,7 +15,7 @@ import (
 	"github.com/uber/jaeger-client-go/zipkin"
 )
 
-func Run(port int, url string) {
+func Run(port int, randomApiUrl, colourApiUrl string) {
 	propagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
 	trace, closer := jaeger.NewTracer(
 		"api_gateway",
@@ -37,18 +37,33 @@ func Run(port int, url string) {
 	r.GET("/api/v1/random/field/",
 		opengintracing.SpanFromHeadersHttpFmt(trace, "RandomField", fn, false),
 		func(c *gin.Context) {
-			n, err := randomNum(url)
+			n, err := randomNum(randomApiUrl)
 			n %= 37
 			if err != nil {
-				c.JSON(500, gin.H{"error": err})
+				c.JSON(500, gin.H{"error random nim api": err})
+				return
+			}
+			colour, err := numberColour(colourApiUrl, n)
+			if err != nil {
+				c.JSON(500, gin.H{"error colour api": err})
 				return
 			}
 			c.JSON(200, gin.H{
-				"int": n,
+				"int":    n,
+				"colour": colour,
 			})
 		})
 	r.Use(cors.Default())
 	r.Run(fmt.Sprintf(":%d", port))
+}
+
+func numberColour(url string, num int) (string, error) {
+	n := &Colour{}
+	err := getJson(fmt.Sprintf(url, num), n)
+	if err != nil {
+		return "unknown", err
+	}
+	return n.Colour, nil
 }
 
 func randomNum(url string) (int, error) {
@@ -74,4 +89,8 @@ func getJson(url string, target interface{}) error {
 
 type Num struct {
 	Num int `json:"int"`
+}
+
+type Colour struct {
+	Colour string `json:"colour"`
 }
