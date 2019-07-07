@@ -2,3 +2,5 @@ requests
 flask
 flask-cors
 pymongo
+redis
+redis_opentracing
