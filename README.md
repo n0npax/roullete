@@ -6,9 +6,12 @@ It was designed to demonstrate service mash possibilities.
 
 The design is aware uSerice overkill.
 
-## service mesh
+## Service mesh
 
 App deployed to K8S with istio looks like:
 
+### Kiali
 ![Alt text](img/kiali.gif?raw=true "Title")
 
+### Jaeger
+![Alt text](img/jaeger.gif?raw=true "Title")
