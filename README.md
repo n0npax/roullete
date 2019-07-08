@@ -14,4 +14,4 @@ App deployed to K8S with istio looks like:
 ![Alt text](img/kiali.gif?raw=true "Title")
 
 ### Jaeger
-![Alt text](img/jaeger.gif?raw=true "Title")
+![Alt text](img/jaeger.png?raw=true "Title")
