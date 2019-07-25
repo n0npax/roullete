@@ -19,15 +19,16 @@ def bet():
     user = payload.get("user", "anonymous")
     field = payload.get("field", random.randint(1,36))
     
-    spin_id = str(rdb.get("id"))
+    spin_id = rdb.get("id")
     if not spin_id:
         spin_id = "0"
-    
+    spin_id = int(spin_id, base=10)
+
     spin_lock = rdb.get("spinning")
     if spin_lock:
         return jsonify({"error": f"spinning {spin_id} already in progress. No bets"}), 425
         
-    coll = bets[spin_id]
+    coll = bets[f"spin{spin_id}bets"]
     coll.save({"user": user, "amount": amount, "field": field})
     cursor = coll.find({})
     saved_bets = []

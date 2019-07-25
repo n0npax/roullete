@@ -20,7 +20,8 @@ def payout():
     colour = payload["colour"]
 
     spin_id = int(rdb.get("id"))-1
-    coll = bets[str(spin_id)]
+
+    coll = bets[f"spin{spin_id}bets"]
 
     cursor = coll.find({})
     saved_bets = []
@@ -28,8 +29,8 @@ def payout():
         d = dict(document)
         del d['_id']
         saved_bets.append(d)
-    print(saved_bets)
-    print(colour, field)
+    app.logger.error(saved_bets)
+    app.logger.error(f"spin_id: {spin_id}")
     return jsonify(dumps(saved_bets))
 
 

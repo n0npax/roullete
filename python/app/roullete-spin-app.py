@@ -24,7 +24,7 @@ def spin():
     
     rdb.set("spinning", "True", ex=5)
     spin_id+=1
-    rdb.set("id", spin_id)
+    rdb.set("id", str(spin_id))
 
     # get winner
     tracking_headers = getForwardHeaders(request)
