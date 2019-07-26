@@ -48,6 +48,4 @@ if __name__ == "__main__":
     rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password='bets')
     redis_opentracing.trace_client(rdb)
 
-    #rdb = redis.Redis(args.redis_endpoint, port=31682, db=0, password='bets')
-
     app.run(port=args.port, host="0.0.0.0")

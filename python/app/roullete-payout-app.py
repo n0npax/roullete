@@ -8,7 +8,7 @@ from base import app, parser, getForwardHeaders
 from flask import jsonify, request
 from pymongo import MongoClient
 from json import dumps
-
+from collections import defaultdict
 
 
 @app.route("/api/v1/payout/",methods=['POST'])
@@ -29,9 +29,19 @@ def payout():
         d = dict(document)
         del d['_id']
         saved_bets.append(d)
-    app.logger.error(saved_bets)
-    app.logger.error(f"spin_id: {spin_id}")
-    return jsonify(dumps(saved_bets))
+    
+    payout_status = defaultdict(int)
+    for bet in saved_bets:
+        amount = bet["amount"]
+        if bet['field'] == field:
+            payout_status[bet['user']] += amount*35
+        elif bet['colour'] == colour:
+            payout_status[bet['user']] += amount
+        else:
+            payout_status[bet['user']] -= amount
+    app.logger.into("payout status", payout_status)
+    # TODO notify users Cash service
+    return jsonify(dumps(payout_status))
 
 
 if __name__ == "__main__":

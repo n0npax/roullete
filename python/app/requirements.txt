@@ -1,3 +1,4 @@
+grpcio-opentracing
 requests
 flask
 flask-cors
