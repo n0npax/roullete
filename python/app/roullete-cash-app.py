@@ -2,7 +2,6 @@
 import requests
 import json
 import redis
-import redis_opentracing
 from base import app, parser, getForwardHeaders
 from flask import jsonify, request
 from json import dumps
@@ -26,6 +25,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password="bets")
-    redis_opentracing.trace_client(rdb)
 
     app.run(port=args.port, host="0.0.0.0")

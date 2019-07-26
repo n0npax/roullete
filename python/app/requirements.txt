@@ -1,7 +1,6 @@
-grpcio-opentracing
 requests
 flask
 flask-cors
 pymongo
 redis
-redis_opentracing
+jaeger-client

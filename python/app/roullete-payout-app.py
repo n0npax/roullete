@@ -3,7 +3,6 @@ import requests
 import json
 import random
 import redis
-import redis_opentracing
 from base import app, parser, getForwardHeaders
 from flask import jsonify, request
 from pymongo import MongoClient
@@ -69,6 +68,5 @@ if __name__ == "__main__":
     bets = client.bets
 
     rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password="bets")
-    redis_opentracing.trace_client(rdb)
 
     app.run(port=args.port, host="0.0.0.0")

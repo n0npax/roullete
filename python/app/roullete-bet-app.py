@@ -7,7 +7,6 @@ from base import app, parser, getForwardHeaders
 from flask import jsonify, request
 from pymongo import MongoClient
 from bson.json_util import dumps
-import redis_opentracing
 
 
 @app.route("/api/v1/random/field", methods=["POST"])
@@ -79,7 +78,6 @@ if __name__ == "__main__":
     )
     bets = client.bets
     rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password="bets")
-    redis_opentracing.trace_client(rdb)
 
     # rdb = redis.Redis(args.redis_endpoint, port=31682, db=0, password='bets')
     app.run(port=args.port, host="0.0.0.0")
