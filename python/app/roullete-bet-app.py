@@ -28,12 +28,16 @@ def bet():
             requests.get(f"{colour_api_}/{field}", headers=tracking_headers).status_code
             != 200
         ):
-            app.logger.warning(f"{field} is not valid field")
-            raise Exception(f"field {field} cannot be associated with colour")
+            return (
+                jsonify({"error": f"field {field} cannot be associated with colour"}),
+                400,
+            )
 
     if colour and colour not in ["red", "black"]:
-        app.logger.warning(f"{colour} is not valid colour")
-        raise Exception("You can bet just Black or Red")
+        return (jsonify({"error": "you need to bet red or black"}), 400)
+
+    if amount < 0:
+        return (jsonify({"error": "cannot bet negative amount"}), 400)
 
     spin_id = rdb.get("id")
     if not spin_id:
