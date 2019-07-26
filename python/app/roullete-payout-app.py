@@ -39,8 +39,18 @@ def payout():
             payout_status[bet["user"]] += amount
         else:
             payout_status[bet["user"]] -= amount
-    app.logger.info("payout status", payout_status)
-    # TODO notify users Cash service
+
+    redis_cash = rdb.get("cash")
+    cash = {}
+    if redis_cash:
+        cash = json.loads(redis_cash)
+
+    payload = request.json
+    for user, amount in payout_status.items():
+        cash.setdefault(user, 0)
+        cash[user] += amount
+    rdb.set("cash", json.dumps(cash))
+
     return jsonify(dumps(payout_status))
 
 
@@ -51,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--redis-endpoint", action="store", required=True, dest="redis_endpoint"
     )
-
+    parser.add_argument("--cash-api", action="store", required=True, dest="cash_api")
     args = parser.parse_args()
     client = MongoClient(
         args.mongo_endpoint, username="bets", password="bets", authSource="bets"
