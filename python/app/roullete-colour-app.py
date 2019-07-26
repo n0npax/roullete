@@ -10,6 +10,7 @@ def field_colour(field_num):
     black = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
     red = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
     green = [0]
+    response = 200
     if field_num in red:
         colour = "red"
     elif field_num in black:
@@ -18,9 +19,9 @@ def field_colour(field_num):
         colour = "green"
     else:
         colour = "unknown"
-    data = {'colour': colour}
-    return jsonify(data)
-
+        response = 404
+    data = {"colour": colour}
+    return jsonify(data), response
 
 
 if __name__ == "__main__":

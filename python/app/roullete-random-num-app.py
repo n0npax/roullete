@@ -7,7 +7,7 @@ from flask import jsonify
 @app.route("/api/v1/random/float")
 @app.route("/api/v1/random/float/")
 def random_float():
-    data = {'random': random.random()}
+    data = {"random": random.random()}
     return jsonify(data)
 
 

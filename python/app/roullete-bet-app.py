@@ -10,16 +10,30 @@ from bson.json_util import dumps
 import redis_opentracing
 
 
-@app.route("/api/v1/random/field",methods=['POST'])
-@app.route("/api/v1/bet/",methods=['POST'])
+@app.route("/api/v1/random/field", methods=["POST"])
+@app.route("/api/v1/bet/", methods=["POST"])
 def bet():
     payload = request.json
 
-    amount = payload.get("amount",10)
+    amount = payload.get("amount", 10)
     user = payload.get("user", "anonymous")
-    field = payload.get("field", random.randint(1,36))
+    field = payload.get("field", None)
     colour = payload.get("colour", None)
-    # TODO validate bet (field and amount)
+    tracking_headers = getForwardHeaders(request)
+    if field is None:
+        field = random.randint(0, 36)
+    else:
+        colour_api_ = args.colour_api.strip("/")
+        if (
+            requests.get(f"{colour_api_}/{field}", headers=tracking_headers).status_code
+            != 200
+        ):
+            app.logger.warning(f"{field} is not valid field")
+            raise Exception(f"field {field} cannot be associated with colour")
+
+    if colour and colour not in ["red", "black"]:
+        app.logger.warning(f"{colour} is not valid colour")
+        raise Exception("You can bet just Black or Red")
 
     spin_id = rdb.get("id")
     if not spin_id:
@@ -28,30 +42,40 @@ def bet():
 
     spin_lock = rdb.get("spinning")
     if spin_lock:
-        return jsonify({"error": f"spinning {spin_id} already in progress. No bets"}), 425
-        
+        return (
+            jsonify({"error": f"spinning {spin_id} already in progress. No bets"}),
+            425,
+        )
+
     coll = bets[f"spin{spin_id}bets"]
-    coll.save({"user": user, "amount": amount, "field": field, "colour":colour})
+    coll.save({"user": user, "amount": amount, "field": field, "colour": colour})
     cursor = coll.find({})
     saved_bets = []
     for document in cursor:
         d = dict(document)
-        del d['_id']
+        del d["_id"]
         saved_bets.append(d)
     return jsonify(dumps(saved_bets))
 
+
 if __name__ == "__main__":
-    parser.add_argument("--mongo-endpoint", action="store", required=True, dest="mongo_endpoint")
-    parser.add_argument("--redis-endpoint", action="store", required=True, dest="redis_endpoint")
+    parser.add_argument(
+        "--mongo-endpoint", action="store", required=True, dest="mongo_endpoint"
+    )
+    parser.add_argument(
+        "--redis-endpoint", action="store", required=True, dest="redis_endpoint"
+    )
+    parser.add_argument(
+        "--colour-api", action="store", required=True, dest="colour_api"
+    )
 
     args = parser.parse_args()
-    client = MongoClient(args.mongo_endpoint,
-        username='bets',
-        password='bets',
-        authSource='bets')
+    client = MongoClient(
+        args.mongo_endpoint, username="bets", password="bets", authSource="bets"
+    )
     bets = client.bets
-    rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password='bets')
+    rdb = redis.Redis(args.redis_endpoint, port=6379, db=0, password="bets")
     redis_opentracing.trace_client(rdb)
 
-    #rdb = redis.Redis(args.redis_endpoint, port=31682, db=0, password='bets')
+    # rdb = redis.Redis(args.redis_endpoint, port=31682, db=0, password='bets')
     app.run(port=args.port, host="0.0.0.0")
